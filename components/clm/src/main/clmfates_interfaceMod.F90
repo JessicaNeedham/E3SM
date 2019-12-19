@@ -1983,6 +1983,7 @@ contains
    use FatesIOVariableKindMod, only : patch_r8, patch_ground_r8, patch_size_pft_r8
    use FatesIOVariableKindMod, only : site_r8, site_ground_r8, site_size_pft_r8
    use FatesIOVariableKindMod, only : site_size_r8, site_pft_r8, site_age_r8
+   use FatesIOVariableKindMod, only : site_coage_r8, site_coage_pft_r8
    use FatesIOVariableKindMod, only : site_fuel_r8, site_cwdsc_r8, site_scag_r8
    use FatesIOVariableKindMod, only : site_scagpft_r8, site_agepft_r8
    use FatesIOVariableKindMod, only : site_height_r8, site_elem_r8, site_elpft_r8
@@ -2116,7 +2117,8 @@ contains
                               ptr_patch=this%fates_hist%hvars(ivar)%r82d,    & 
                               default=trim(vdefault))
 
-       case(site_ground_r8, site_size_pft_r8, site_size_r8, site_pft_r8, &
+        case(site_ground_r8, site_size_pft_r8, site_size_r8, site_pft_r8, &
+             site_coage_r8, site_coage_pft_r8, &
              site_age_r8, site_height_r8, site_fuel_r8, site_cwdsc_r8, &
              site_can_r8,site_cnlf_r8, site_cnlfpft_r8, site_scag_r8, & 
              site_scagpft_r8, site_agepft_r8, site_elem_r8, site_elpft_r8, &
@@ -2375,6 +2377,7 @@ contains
    use FatesIODimensionsMod, only : fates_bounds_type
    use FatesInterfaceMod, only : nlevsclass_fates => nlevsclass
    use FatesInterfaceMod, only : nlevage_fates    => nlevage
+   use FatesInterfaceMod, only : nlevcoage_fates  => nlevcoage
    use FatesInterfaceMod, only : nlevheight_fates => nlevheight
    use EDtypesMod,        only : nfsc_fates       => nfsc
    use FatesLitterMod,    only : ncwd_fates       => ncwd
@@ -2412,6 +2415,12 @@ contains
    fates%age_class_begin = 1
    fates%age_class_end = nlevage_fates
 
+   fates%coagepft_class_begin = 1
+   fates%coagepft_class_end = nlevcoage_fates * numpft_fates
+
+   fates%coage_class_begin = 1
+   fates%coage_class_end = nlevcoage_fates
+   
    fates%sizeage_class_begin = 1
    fates%sizeage_class_end   = nlevsclass_fates * nlevage_fates
    
