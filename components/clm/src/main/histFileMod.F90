@@ -996,7 +996,7 @@ contains
     !-----------------------------------------------------------------------
 
     do t = 1,ntapes
-!$OMP PARALLEL DO PRIVATE (f, num2d)
+!$OMP PARALLEL DO PRIVATE (f, numdims, num2d)
        do f = 1,tape(t)%nflds
           numdims = tape(t)%hlist(f)%field%numdims
           if ( numdims == 1) then   
@@ -1723,7 +1723,7 @@ contains
     !
     ! !USES:
     use clm_varpar      , only : nlevgrnd, nlevsno, nlevlak, nlevurb, numrad, nmonth
-    use clm_varpar      , only : natpft_size, cft_size, maxpatch_glcmec, nlevdecomp_full, nlevtrc_full
+    use clm_varpar      , only : natpft_size, cft_size, maxpatch_glcmec, nlevdecomp_full, nlevtrc_full, nvegwcs
     use landunit_varcon , only : max_lunit
     use clm_varctl      , only : caseid, ctitle, fsurdat, finidat, paramfile
     use clm_varctl      , only : version, hostname, username, conventions, source
@@ -1871,6 +1871,7 @@ contains
     call ncd_defdim(lnfid, 'month'  , nmonth,  dimid)
     call ncd_defdim(lnfid, 'levsno' , nlevsno , dimid)
     call ncd_defdim(lnfid, 'ltype', max_lunit, dimid)
+    call ncd_defdim(lnfid, 'nvegwcs',nvegwcs, dimid)
     call htape_add_ltype_metadata(lnfid)
     call ncd_defdim(lnfid, 'natpft', natpft_size, dimid)
     if (cft_size > 0) then
@@ -2681,6 +2682,7 @@ contains
           call ncd_io(varname='lon', data=ldomain%lonc, dim1name=grlnd, ncid=nfid(t), flag='write')
           call ncd_io(varname='lat', data=ldomain%latc, dim1name=grlnd, ncid=nfid(t), flag='write')
        end if
+       call ncd_io(varname='topo'    , data=ldomain%topo, dim1name=grlnd, ncid=nfid(t), flag='write')
        call ncd_io(varname='area'    , data=ldomain%area, dim1name=grlnd, ncid=nfid(t), flag='write')
        call ncd_io(varname='landfrac', data=ldomain%frac, dim1name=grlnd, ncid=nfid(t), flag='write')
        call ncd_io(varname='landmask', data=ldomain%mask, dim1name=grlnd, ncid=nfid(t), flag='write')
@@ -4506,7 +4508,7 @@ contains
     ! initial or branch run to initialize the actual history tapes.
     !
     ! !USES:
-    use clm_varpar      , only : nlevgrnd, nlevsno, nlevlak, numrad, nlevdecomp_full, nlevtrc_soil, nmonth    
+    use clm_varpar      , only : nlevgrnd, nlevsno, nlevlak, numrad, nlevdecomp_full, nlevtrc_soil, nmonth, nvegwcs
     use clm_varpar      , only : natpft_size, cft_size, maxpatch_glcmec
     use landunit_varcon , only : max_lunit
     !
@@ -4633,6 +4635,8 @@ contains
        end if
     case ('levsno')
        num2d = nlevsno
+    case ('nvegwcs')
+        num2d = nvegwcs
     case ('fates_levscls')
        num2d = nlevsclass_fates
     case ('fates_levcacls')

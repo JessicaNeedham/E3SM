@@ -130,6 +130,20 @@ module clm_varctl
 
   ! True is 2way, false is 1way
   logical, public :: tw_irr = .false.  
+  
+  !----------------------------------------------------------
+  ! Extra groundwater pumping for irrigation
+  !----------------------------------------------------------
+
+  ! True is extra pumping, false is stick with the gw fraction
+  logical, public :: extra_gw_irr = .false. 
+  
+  !----------------------------------------------------------
+  ! FIRRIG data
+  !----------------------------------------------------------
+
+  ! True is read from surface data, false is constant
+  logical, public :: firrig_data = .false. 
 
   !----------------------------------------------------------
   ! Landunit logic
@@ -221,6 +235,11 @@ module clm_varctl
   !----------------------------------------------------------
 
   logical, public :: use_lai_streams = .false. ! true => use lai streams in SatellitePhenologyMod.F90
+  !----------------------------------------------------------
+  ! plant hydraulic stress switch
+  !----------------------------------------------------------
+
+  logical, public :: use_hydrstress = .false. ! true => use plant hydraulic stress calculation
 
   !----------------------------------------------------------
   ! dynamic root switch

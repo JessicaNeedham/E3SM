@@ -222,7 +222,7 @@ contains
     namelist /clm_inparm/  &
          clump_pproc, wrtdia, &
          create_crop_landunit, nsegspc, co2_ppmv, override_nsrest, &
-         albice, more_vertlayers, subgridflag, irrigate, tw_irr, all_active
+         albice, more_vertlayers, subgridflag, irrigate, tw_irr, extra_gw_irr, firrig_data, all_active
     ! Urban options
 
     namelist /clm_inparm/  &
@@ -279,6 +279,8 @@ contains
     namelist /clm_inparm / &
          use_vsfm, vsfm_satfunc_type, vsfm_use_dynamic_linesearch, &
          vsfm_lateral_model_type, vsfm_include_seepage_bc
+
+    namelist /clm_inparm/ use_hydrstress
 
     namelist /clm_inparm/ &
        lateral_connectivity, domain_decomp_type
@@ -633,6 +635,8 @@ contains
     ! Irrigation
     call mpi_bcast(irrigate, 1, MPI_LOGICAL, 0, mpicom, ier)
     call mpi_bcast(tw_irr, 1, MPI_LOGICAL, 0, mpicom, ier)
+    call mpi_bcast(extra_gw_irr, 1, MPI_LOGICAL, 0, mpicom, ier)
+    call mpi_bcast(firrig_data, 1, MPI_LOGICAL, 0, mpicom, ier)
 
     ! Landunit generation
     call mpi_bcast(create_crop_landunit, 1, MPI_LOGICAL, 0, mpicom, ier)
@@ -795,6 +799,8 @@ contains
      call mpi_bcast (co2_file,       len(co2_file),       MPI_CHARACTER, 0, mpicom, ier)
      call mpi_bcast (aero_file,      len(aero_file),      MPI_CHARACTER, 0, mpicom, ier)
 
+    ! plant hydraulics
+    call mpi_bcast (use_hydrstress, 1, MPI_LOGICAL, 0, mpicom, ier)
 
     ! VSFM variable
 
