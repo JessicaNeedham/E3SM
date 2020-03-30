@@ -218,6 +218,7 @@ module clm_varctl
   logical, public            :: use_fates_planthydro = .false.         ! true => turn on fates hydro
   logical, public            :: use_fates_ed_st3   = .false.           ! true => static stand structure
   logical, public            :: use_fates_ed_prescribed_phys = .false. ! true => prescribed physiology
+  logical, public            :: use_fates_cohort_age_tracking = .false.! true => cohort age tracking
   logical, public            :: use_fates_inventory_init = .false.     ! true => initialize fates from inventory
   character(len=256), public :: fates_inventory_ctrl_filename = ''     ! filename for inventory control
   integer, public            :: fates_parteh_mode = -9                 ! 1 => carbon only
