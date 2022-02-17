@@ -1939,8 +1939,8 @@ contains
        call ncd_defdim(lnfid, 'fates_levcnlfpf', nlevleaf_fates * nclmax_fates * numpft_fates, dimid)
        call ncd_defdim(lnfid, 'fates_levscagpf', nlevsclass_fates * nlevage_fates * numpft_fates, dimid)
        call ncd_defdim(lnfid, 'fates_levagepft', nlevage_fates * numpft_fates, dimid)
-       call ncd_defdim(lnfid, 'fates_levcdsc', ncrowndamage * nlevsclass_fates, dimid)
-       call ncd_defdim(lnfid, 'fates_levcdpf', ncrwondamage * nlevscalss_fates * numpft_fates, dimid)
+       call ncd_defdim(lnfid, 'fates_levcdsc', ncrowndamage_fates * nlevsclass_fates, dimid)
+       call ncd_defdim(lnfid, 'fates_levcdpf', ncrowndamage_fates * nlevsclass_fates * numpft_fates, dimid)
        call ncd_defdim(lnfid, 'fates_levheight', nlevheight_fates, dimid)
        call ncd_defdim(lnfid, 'fates_levelem', nelements_fates, dimid)
        call ncd_defdim(lnfid, 'fates_levelpft', nelements_fates * numpft_fates, dimid)
@@ -2346,6 +2346,11 @@ contains
     use FatesInterfaceTypesMod, only : fates_hdim_levcoage
     use FatesInterfaceTypesMod, only : fates_hdim_pfmap_levcapf
     use FatesInterfaceTypesMod, only : fates_hdim_camap_levcapf
+    use FatesInterfaceTypesMod, only : fates_hdim_scmap_levcdsc
+    use FatesInterfaceTypesMod, only : fates_hdim_cdmap_levcdsc
+    use FatesInterfaceTypesMod, only : fates_hdim_scmap_levcdpf
+    use FatesInterfaceTypesMod, only : fates_hdim_cdmap_levcdpf
+    use FatesInterfaceTypesMod, only : fates_hdim_pftmap_levcdpf
     use FatesInterfaceTypesMod, only : fates_hdim_levage
     use FatesInterfaceTypesMod, only : fates_hdim_levpft
     use FatesInterfaceTypesMod, only : fates_hdim_scmap_levscag
@@ -2494,9 +2499,9 @@ contains
                   long_name='FATES age-class map into patch age x fuel size', units='-', ncid=nfid(t))
              call ncd_defvar(varname='fates_fscmap_levagefuel', xtype=ncd_int, dim1name='fates_levagefuel', &
                   long_name='FATES fuel size-class map into patch age x fuel size', units='-', ncid=nfid(t))
-             call ncd_defvar(varname='fates_cdmap_levcdsc',xtype=ncd_ind, dim1name='fates_levcdsc', &
+             call ncd_defvar(varname='fates_cdmap_levcdsc',xtype=ncd_int, dim1name='fates_levcdsc', &
                   long_name='FATES damage index of the combined damage-size dimension', ncid=nfid(t))
-             call ncd_defvar(varname='fates_scmap_levcdsc',xtype=ncd_ind, dim1name='fates_levcdsc', &
+             call ncd_defvar(varname='fates_scmap_levcdsc',xtype=ncd_int, dim1name='fates_levcdsc', &
                   long_name='FATES size index of the combined dmage-size dimension', ncid=nfid(t))
              call ncd_defvar(varname='fates_cdmap_levcdpf',xtype=ncd_int, dim1name='fates_levcdpf', &
                   long_name='FATES damage index of the combined damage-size-PFT dimension', ncid=nfid(t))
@@ -2550,6 +2555,11 @@ contains
              call ncd_io(varname='fates_agemap_levelage',data=fates_hdim_agemap_levelage, ncid=nfid(t),flag='write')
              call ncd_io(varname='fates_agmap_levagefuel',data=fates_hdim_agmap_levagefuel, ncid=nfid(t), flag='write')
              call ncd_io(varname='fates_fscmap_levagefuel',data=fates_hdim_fscmap_levagefuel, ncid=nfid(t), flag='write')
+             call ncd_io(varname='fates_scmap_levcdsc',data=fates_hdim_scmap_levcdsc, ncid=nfid(t), flag='write')
+             call ncd_io(varname='fates_cdmap_levcdsc',data=fates_hdim_cdmap_levcdsc, ncid=nfid(t), flag='write')
+             call ncd_io(varname='fates_scmap_levcdpf',data=fates_hdim_scmap_levcdpf, ncid=nfid(t), flag='write')
+             call ncd_io(varname='fates_cdmap_levcdpf',data=fates_hdim_cdmap_levcdpf, ncid=nfid(t), flag='write')
+             call ncd_io(varname='fates_pftmap_levcdpf',data=fates_hdim_pftmap_levcdpf, ncid=nfid(t), flag='write')
           end if
 
        endif
