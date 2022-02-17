@@ -58,6 +58,7 @@ module ELMFatesInterfaceMod
    use elm_varctl        , only : use_fates_sp
    use elm_varctl        , only : use_fates_canopy_damage
    use elm_varctl        , only : use_fates_understory_damage
+   use elm_varctl        , only : nsrest, nsrBranch
    use elm_varctl        , only : fates_inventory_ctrl_filename
    use elm_varctl        , only : use_lch4
    use elm_varcon        , only : tfrz
@@ -100,7 +101,7 @@ module ELMFatesInterfaceMod
    use ColumnType        , only : col_pp
    use ColumnDataType    , only : col_es, col_ws, col_wf, col_cs, col_cf
    use ColumnDataType    , only : col_nf, col_pf
-   use VegetationDataType, only : veg_es, veg_wf
+   use VegetationDataType, only : veg_es, veg_wf, veg_ws
    use LandunitType      , only : lun_pp
 
    use landunit_varcon   , only : istsoil
@@ -122,13 +123,16 @@ module ELMFatesInterfaceMod
    use FatesInterfaceMod     , only : set_fates_ctrlparms
    use FatesInterfaceMod     , only : zero_bcs
    use FatesInterfaceMod     , only : FatesInterfaceInit
-
+   use FatesInterfaceMod     , only : UpdateFatesRMeansTStep
+   use FatesInterfaceMod     , only : InitTimeAveragingGlobals
+   
    use FatesHistoryInterfaceMod, only : fates_hist
    use FatesRestartInterfaceMod, only : fates_restart_interface_type
 
    use PRTGenericMod         , only : num_elements
    use EDTypesMod            , only : ed_patch_type
    use FatesInterfaceTypesMod, only : hlm_numlevgrnd
+   use FatesInterfaceTypesMod, only : hlm_stepsize
    use EDMainMod             , only : ed_ecosystem_dynamics
    use EDMainMod             , only : ed_update_site
    use EDInitMod             , only : zero_site
@@ -152,6 +156,13 @@ module ELMFatesInterfaceMod
    use FatesPlantHydraulicsMod, only : RestartHydrStates
 
    use dynHarvestMod          , only : num_harvest_vars, harvest_varnames
+   use dynHarvestMod          , only : harvest_rates ! these are dynamic in space and time
+   use dynHarvestMod          , only : num_harvest_vars, harvest_varnames, wood_harvest_units
+
+   use FatesConstantsMod      , only : hlm_harvest_area_fraction
+   use FatesConstantsMod      , only : hlm_harvest_carbon
+
+   use dynSubgridControlMod, only : get_do_harvest ! this gets the namelist value
 
    use FatesInterfaceTypesMod , only : bc_in_type, bc_out_type
    use CLMFatesParamInterfaceMod         , only : FatesReadParameters
@@ -211,7 +222,8 @@ module ELMFatesInterfaceMod
       procedure, private :: init_soil_depths
       procedure, public  :: ComputeRootSoilFlux
       procedure, public  :: wrap_hydraulics_drive
-
+      procedure, public  :: WrapUpdateFatesRmean
+      
    end type hlm_fates_interface_type
 
    ! hlm_bounds_to_fates_bounds is not currently called outside the interface.
@@ -231,7 +243,8 @@ module ELMFatesInterfaceMod
         __FILE__
 
    public  :: ELMFatesGlobals
-
+   public  :: ELMFatesTimesteps
+   
 contains
 
 
@@ -261,7 +274,7 @@ contains
      integer                                        :: pass_canopy_damage
      integer                                        :: pass_understory_damage
      integer                                        :: pass_biogeog
-     integer                                        :: pass_num_lu_harvest_cats
+     integer                                        :: pass_num_lu_harvest_types
      integer                                        :: pass_lu_harvest
      integer                                        :: pass_nocomp
      integer                                        :: pass_sp
@@ -290,7 +303,7 @@ contains
 
      if (use_fates) then
 
-        verbose_output = .false.
+verbose_output = .false.
         call FatesInterfaceInit(iulog, verbose_output)
 
         ! Force FATES parameters that are recieve type, to the unset value
@@ -326,9 +339,8 @@ contains
 
         call set_fates_ctrlparms('nitrogen_spec',ival=1)
         call set_fates_ctrlparms('phosphorus_spec',ival=1)
-
-
-        if(is_restart()) then
+        
+        if(is_restart() .or. nsrest .eq. nsrBranch) then
            pass_is_restart = 1
         else
            pass_is_restart = 0
@@ -399,18 +411,18 @@ contains
            pass_logging = 0
         end if
 
-        if(do_elm_fates_harvest) then
-!        if(get_do_harvest()) then
+!        if(do_elm_fates_harvest) then
+        if(get_do_harvest()) then
            pass_logging = 1
-           pass_num_lu_harvest_cats = num_harvest_vars
+           pass_num_lu_harvest_types = num_harvest_vars
            pass_lu_harvest = 1
         else
            pass_lu_harvest = 0
-           pass_num_lu_harvest_cats = 0
+           pass_num_lu_harvest_types = 0
         end if
 
         call set_fates_ctrlparms('use_lu_harvest',ival=pass_lu_harvest)
-        call set_fates_ctrlparms('num_lu_harvest_cats',ival=pass_num_lu_harvest_cats)
+        call set_fates_ctrlparms('num_lu_harvest_cats',ival=pass_num_lu_harvest_types)
         call set_fates_ctrlparms('use_logging',ival=pass_logging)
 
         if(use_fates_ed_st3) then
@@ -491,7 +503,18 @@ contains
 
      return
    end subroutine ELMFatesGlobals
-
+   
+   ! ====================================================================================
+   
+   subroutine ELMFatesTimesteps()
+     
+     hlm_stepsize = real(get_step_size(),r8)
+     
+     call InitTimeAveragingGlobals()
+     
+     return
+   end subroutine ELMFatesTimesteps
+   
    ! ====================================================================================
 
    subroutine init(this, bounds_proc )
@@ -794,6 +817,7 @@ contains
       integer  :: ifp                      ! patch index
       integer  :: ft                       ! patch functional type index
       integer  :: p                        ! HLM patch index
+      integer  :: g                        ! HLM grid index
       integer  :: nc                       ! clump index
       integer  :: nlevsoil                 ! number of soil layers at the site
 
@@ -839,8 +863,6 @@ contains
 
          do ifp = 1, this%fates(nc)%sites(s)%youngest_patch%patchno
             p = ifp+col_pp%pfti(c)
-            this%fates(nc)%bc_in(s)%t_veg24_pa(ifp) = &
-                 veg_es%t_veg24(p)
 
             this%fates(nc)%bc_in(s)%precip24_pa(ifp) = &
                   top_af_inst%prec24h(t)
@@ -875,6 +897,16 @@ contains
             this%fates(nc)%bc_in(s)%h2o_liq_sisl(1:nlevsoil) =  col_ws%h2osoi_liq(c,1:nlevsoil)
          end if
 
+         ! get the harvest data, which is by gridcell
+         ! for now there is one veg column per gridcell, so store all harvest data in each site
+         ! this will eventually change
+         ! the harvest data are zero if today is before the start of the harvest time series
+         g = col_pp%gridcell(c)
+         if (get_do_harvest()) then
+            this%fates(nc)%bc_in(s)%hlm_harvest_rates = harvest_rates(:,g)
+            this%fates(nc)%bc_in(s)%hlm_harvest_catnames = harvest_varnames
+            this%fates(nc)%bc_in(s)%hlm_harvest_units = wood_harvest_units
+         end if
 
       end do
 
@@ -1552,6 +1584,11 @@ contains
                ! ------------------------------------------------------------------------
                ! Update history IO fields that depend on ecosystem dynamics
                ! ------------------------------------------------------------------------
+               call fates_hist%flush_hvars(nc,upfreq_in=1)
+               do s = 1,this%fates(nc)%nsites
+                  call fates_hist%zero_site_hvars(this%fates(nc)%sites(s),     &
+                       upfreq_in=1)
+               end do
                call fates_hist%update_history_dyn( nc, &
                     this%fates(nc)%nsites,                 &
                     this%fates(nc)%sites)
@@ -1703,6 +1740,12 @@ contains
            ! ------------------------------------------------------------------------
            ! Update history IO fields that depend on ecosystem dynamics
            ! ------------------------------------------------------------------------
+
+           call fates_hist%flush_hvars(nc,upfreq_in=1)
+           do s = 1,this%fates(nc)%nsites
+              call fates_hist%zero_site_hvars(this%fates(nc)%sites(s),     &
+                   upfreq_in=1)
+           end do
            call fates_hist%update_history_dyn( nc, &
                 this%fates(nc)%nsites,                 &
                 this%fates(nc)%sites)
@@ -2032,7 +2075,6 @@ contains
     use elm_varctl        , only : iulog
     use perf_mod          , only : t_startf, t_stopf
     use quadraticMod      , only : quadratic
-    use EDTypesMod        , only : dinc_ed
     use EDtypesMod        , only : ed_patch_type, ed_cohort_type, ed_site_type
 
     !
@@ -2236,6 +2278,12 @@ contains
              this%fates(nc)%bc_in(s)%albgr_dir_rb(:) = albgrd_col(c,:)
              this%fates(nc)%bc_in(s)%albgr_dif_rb(:) = albgri_col(c,:)
 
+             if (veg_es%t_veg(p) <= tfrz) then
+                this%fates(nc)%bc_in(s)%fcansno_pa(ifp) = veg_ws%fwet(p)
+             else
+                this%fates(nc)%bc_in(s)%fcansno_pa(ifp) = 0._r8
+             end if
+             
           else
 
              this%fates(nc)%bc_in(s)%filter_vegzen_pa(ifp) = .false.
@@ -2359,6 +2407,29 @@ end subroutine wrap_update_hifrq_hist
 
  ! ======================================================================================
 
+ subroutine WrapUpdateFatesRmean(this, nc)
+   
+   class(hlm_fates_interface_type), intent(inout) :: this
+   integer,intent(in) :: nc
+   
+   ! !LOCAL VARIABLES:
+   integer                     :: s,c,p,ifp  ! indices and loop counters
+   
+   do s = 1, this%fates(nc)%nsites
+      c = this%f2hmap(nc)%fcolumn(s)
+      do ifp = 1, this%fates(nc)%sites(s)%youngest_patch%patchno
+         p = ifp+col_pp%pfti(c)
+         this%fates(nc)%bc_in(s)%t_veg_pa(ifp) = veg_es%t_veg(p)
+      end do
+   end do
+
+   call UpdateFatesRMeansTStep(this%fates(nc)%sites,this%fates(nc)%bc_in)
+   
+  end subroutine WrapUpdateFatesRmean
+
+ 
+ ! ======================================================================================
+ 
  subroutine init_history_io(this,bounds_proc)
 
    use histFileMod, only : hist_addfld1d, hist_addfld2d, hist_addfld_decomp
