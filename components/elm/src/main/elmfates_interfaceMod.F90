@@ -2874,10 +2874,10 @@ end subroutine wrap_update_hifrq_hist
    fates%cnlfpft_end = nlevleaf_fates * nclmax_fates * numpft_fates
 
    fates%cdpf_begin = 1
-   fates%cdpf_end = ncrowndamage * numpft_fates * nlevsclass
+   fates%cdpf_end = ncrowndamage_fates * numpft_fates * nlevsclass_fates
 
    fates%cdsc_begin = 1
-   fates%cdsc_end = ncrowndamage * nlevsclass 
+   fates%cdsc_end = ncrowndamage_fates * nlevsclass_fates 
    
    fates%height_begin = 1
    fates%height_end = nlevheight_fates
