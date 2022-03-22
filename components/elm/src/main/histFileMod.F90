@@ -1943,6 +1943,7 @@ contains
        call ncd_defdim(lnfid, 'fates_levagepft', nlevage_fates * numpft_fates, dimid)
        call ncd_defdim(lnfid, 'fates_levcdsc', ncrowndamage_fates * nlevsclass_fates, dimid)
        call ncd_defdim(lnfid, 'fates_levcdpf', ncrowndamage_fates * nlevsclass_fates * numpft_fates, dimid)
+       call ncd_defdim(lnfid, 'fates_levcdam', ncrowndamage_fates, dimid)
        call ncd_defdim(lnfid, 'fates_levheight', nlevheight_fates, dimid)
        call ncd_defdim(lnfid, 'fates_levelem', nelements_fates, dimid)
        call ncd_defdim(lnfid, 'fates_levelpft', nelements_fates * numpft_fates, dimid)
@@ -2349,6 +2350,7 @@ contains
     use FatesInterfaceTypesMod, only : fates_hdim_levcoage
     use FatesInterfaceTypesMod, only : fates_hdim_pfmap_levcapf
     use FatesInterfaceTypesMod, only : fates_hdim_camap_levcapf
+    use FatesInterfaceTypesMod, only : fates_hdim_levcdam
     use FatesInterfaceTypesMod, only : fates_hdim_scmap_levcdsc
     use FatesInterfaceTypesMod, only : fates_hdim_cdmap_levcdsc
     use FatesInterfaceTypesMod, only : fates_hdim_scmap_levcdpf
@@ -2519,6 +2521,8 @@ contains
                   long_name='FATES size index of the combined damage-size-PFT dimension', ncid=nfid(t))
              call ncd_defvar(varname='fates_pftmap_levcdpf',xtype=ncd_int, dim1name='fates_levcdpf', &
                   long_name='FATES pft index of the combined damage-size-PFT dimension', ncid=nfid(t))
+              call ncd_defvar(varname='fates_levcdam', xtype=tape(t)%ncprec, dim1name='fates_levcdam', &
+                   long_name='FATES damage class lower bound', units='unitless', ncid=nfid(t))
           end if
 
        elseif (mode == 'write') then
@@ -2572,6 +2576,7 @@ contains
              call ncd_io(varname='fates_scmap_levcdpf',data=fates_hdim_scmap_levcdpf, ncid=nfid(t), flag='write')
              call ncd_io(varname='fates_cdmap_levcdpf',data=fates_hdim_cdmap_levcdpf, ncid=nfid(t), flag='write')
              call ncd_io(varname='fates_pftmap_levcdpf',data=fates_hdim_pftmap_levcdpf, ncid=nfid(t), flag='write')
+             call ncd_io(varname='fates_levcdam',data=fates_hdim_levcdam, ncid=nfid(t), flag='write')
           end if
 
        endif
@@ -4848,6 +4853,8 @@ contains
        num2d = ncrowndamage_fates * nlevsclass_fates
     case ('fates_levcdpf')
        num2d = ncrowndamage_fates * nlevsclass_fates * numpft_fates
+    case ('fates_levcdam')
+       num2d = ncrowndamage_fates
     case default
        write(iulog,*) trim(subname),' ERROR: unsupported 2d type ',type2d, &
           ' currently supported types for multi level fields are: ', &
