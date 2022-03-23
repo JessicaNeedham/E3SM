@@ -536,7 +536,7 @@ verbose_output = .false.
 
       use FatesInterfaceMod,        only : FatesReportParameters
       use FatesParameterDerivedMod, only : param_derived
-      use FatesInterfaceTypesMod,   only : ncrowndamage_fates => ncrowndamage
+      use FatesInterfaceTypesMod,   only : nlevdamage_fates => nlevdamage
       use FatesInterfaceTypesMod,   only : numpft_fates => numpft
       use elm_varsur,               only : wt_nat_patch
       use topounit_varcon           , only: max_topounits, has_topounit
@@ -568,7 +568,7 @@ verbose_output = .false.
       ! 1) allocate the vectors
       ! 2) add the history variables defined in clm_inst to the history machinery
       call param_derived%Init( numpft_fates )
-      call param_derived%InitDamageTransitions (ncrowndamage_fates, numpft_fates)
+      call param_derived%InitDamageTransitions (nlevdamage_fates, numpft_fates)
 
       nclumps = get_proc_clumps()
       allocate(this%fates(nclumps))
@@ -2801,7 +2801,7 @@ end subroutine wrap_update_hifrq_hist
    use FatesInterfaceTypesMod, only : nlevsclass_fates => nlevsclass
    use FatesInterfaceTypesMod, only : nlevage_fates    => nlevage
    use FatesInterfaceTypesMod, only : nlevheight_fates => nlevheight
-   use FatesInterfaceTypesMod, only : ncrowndamage_fates => ncrowndamage
+   use FatesInterfaceTypesMod, only : nlevdamage_fates => nlevdamage
    use EDtypesMod,        only : nfsc_fates       => nfsc
    use FatesLitterMod,    only : ncwd_fates       => ncwd
    use EDtypesMod,        only : nlevleaf_fates   => nlevleaf
@@ -2854,13 +2854,13 @@ end subroutine wrap_update_hifrq_hist
    fates%cnlfpft_end = nlevleaf_fates * nclmax_fates * numpft_fates
 
    fates%cdpf_begin = 1
-   fates%cdpf_end = ncrowndamage_fates * numpft_fates * nlevsclass_fates
+   fates%cdpf_end = nlevdamage_fates * numpft_fates * nlevsclass_fates
 
    fates%cdsc_begin = 1
-   fates%cdsc_end = ncrowndamage_fates * nlevsclass_fates 
+   fates%cdsc_end = nlevdamage_fates * nlevsclass_fates 
    
    fates%cdam_begin = 1
-   fates%cdam_end = ncrowndamage_fates
+   fates%cdam_end = nlevdamage_fates
    
    fates%height_begin = 1
    fates%height_end = nlevheight_fates
