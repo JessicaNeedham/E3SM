@@ -2350,7 +2350,7 @@ contains
     use FatesInterfaceTypesMod, only : fates_hdim_levcoage
     use FatesInterfaceTypesMod, only : fates_hdim_pfmap_levcapf
     use FatesInterfaceTypesMod, only : fates_hdim_camap_levcapf
-    use FatesInterfaceTypesMod, only : fates_hdim_levcdam
+    use FatesInterfaceTypesMod, only : fates_hdim_levdamage
     use FatesInterfaceTypesMod, only : fates_hdim_scmap_levcdsc
     use FatesInterfaceTypesMod, only : fates_hdim_cdmap_levcdsc
     use FatesInterfaceTypesMod, only : fates_hdim_scmap_levcdpf
@@ -2576,7 +2576,7 @@ contains
              call ncd_io(varname='fates_scmap_levcdpf',data=fates_hdim_scmap_levcdpf, ncid=nfid(t), flag='write')
              call ncd_io(varname='fates_cdmap_levcdpf',data=fates_hdim_cdmap_levcdpf, ncid=nfid(t), flag='write')
              call ncd_io(varname='fates_pftmap_levcdpf',data=fates_hdim_pftmap_levcdpf, ncid=nfid(t), flag='write')
-             call ncd_io(varname='fates_levcdam',data=fates_hdim_levcdam, ncid=nfid(t), flag='write')
+             call ncd_io(varname='fates_levcdam',data=fates_hdim_levdamage, ncid=nfid(t), flag='write')
           end if
 
        endif
