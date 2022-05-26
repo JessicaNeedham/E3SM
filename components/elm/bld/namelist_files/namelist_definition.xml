@@ -347,14 +347,9 @@ Toggle to turn on Static Stand Structure Mode (only relevant if FATES is being u
 Toggle to turn on prescribed physiology (only relevant if FATES is being used).
 </entry>
 
-<entry id="use_fates_canopy_damage" type="logical" category="physics"
+<entry id="use_fates_crown_damage" type="logical" category="physics"
         group="elm_inparm" valid_values="" value=".false.">
-Toggle to turn on canopy crown damage (only relevant if FATES is being used).
-</entry>
-
-<entry id="use_fates_understory_damage" type="logical" category="physics"
-        group="elm_inparm" valid_values="" value=".false.">
-Toggle to turn on understory crown damage (only relevant if FATES is being used).
+Toggle to turn on crown damage (only relevant if FATES is being used).
 </entry>
 
 <entry id="use_fates_inventory_init" type="logical" category="physics"

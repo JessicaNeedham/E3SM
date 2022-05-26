@@ -786,7 +786,7 @@ sub setup_cmdl_fates_mode {
 		                 "use_fates_inventory_init", "use_fates_fixed_biogeog", "use_fates_nocomp","use_fates_sp",
                      "fates_inventory_ctrl_filename","use_fates_logging",
 		     "use_fates_parteh_mode","use_fates_cohort_age_tracking","use_snicar_ad",
-	              "use_fates_canopy_damage", "use_fates_understory_damage");
+	              "use_fates_crown_damage");
       foreach my $var ( @list ) {
 	  if ( defined($nl->get_value($var))  ) {
 	      $nl_flags->{$var} = $nl->get_value($var);
@@ -846,15 +846,11 @@ sub setup_cmdl_fates_mode {
        if ( defined($nl->get_value($var)) ) {
 	   fatal_error("$var is being set, but can ONLY be set when -bgc fates option is used.\n");
        }
-        $var = "use_fates_canopy_damage";
+        $var = "use_fates_crown_damage";
        if ( defined($nl->get_value($var)) ) {
            fatal_error("$var is being set, but can ONLY be set when -bgc fates option is used.\n");
        }
-       $var = "use_fates_understory_damage";
-       if ( defined($nl->get_value($var)) ) {
-           fatal_error("$var is being set, but can ONLY be set when -bgc fates option is used.\n");
-       }
-
+      
     }
   }
 }
@@ -3139,8 +3135,7 @@ sub setup_logic_fates {
     add_default($test_files, $nl_flags->{'inputdata_rootdir'}, $definition, $defaults, $nl, 'use_fates_inventory_init',     'use_fates'=>$nl_flags->{'use_fates'});
     add_default($test_files, $nl_flags->{'inputdata_rootdir'}, $definition, $defaults, $nl, 'fates_inventory_ctrl_filename','use_fates'=>$nl_flags->{'use_fates'});
     add_default($test_files, $nl_flags->{'inputdata_rootdir'}, $definition, $defaults, $nl, 'use_fates_cohort_age_tracking','use_fates'=>$nl_flags->{'use_fates'});
-    add_default($test_files, $nl_flags->{'inputdata_rootdir'}, $definition, $defaults, $nl, 'use_fates_canopy_damage',      'use_fates'=>$nl_flags->{'use_fates'});
-    add_default($test_files, $nl_flags->{'inputdata_rootdir'}, $definition, $defaults, $nl, 'use_fates_understory_damage',  'use_fates'=>$nl_flags->{'use_fates'});
+    add_default($test_files, $nl_flags->{'inputdata_rootdir'}, $definition, $defaults, $nl, 'use_fates_crown_damage',       'use_fates'=>$nl_flags->{'use_fates'});
     add_default($test_files, $nl_flags->{'inputdata_rootdir'}, $definition, $defaults, $nl, 'use_fates_sp',                 'use_fates'=>$nl_flags->{'use_fates'});
     add_default($test_files, $nl_flags->{'inputdata_rootdir'}, $definition, $defaults, $nl, 'use_fates_nocomp',             'use_fates'=>$nl_flags->{'use_fates'});
     add_default($test_files, $nl_flags->{'inputdata_rootdir'}, $definition, $defaults, $nl, 'fates_paramfile', 'phys'=>$nl_flags->{'phys'});

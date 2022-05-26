@@ -56,8 +56,7 @@ module ELMFatesInterfaceMod
    use elm_varctl        , only : use_fates_fixed_biogeog
    use elm_varctl        , only : use_fates_nocomp
    use elm_varctl        , only : use_fates_sp
-   use elm_varctl        , only : use_fates_canopy_damage
-   use elm_varctl        , only : use_fates_understory_damage
+   use elm_varctl        , only : use_fates_crown_damage
    use elm_varctl        , only : nsrest, nsrBranch
    use elm_varctl        , only : fates_inventory_ctrl_filename
    use elm_varctl        , only : use_lch4
@@ -270,8 +269,7 @@ contains
      integer                                        :: pass_inventory_init
      integer                                        :: pass_is_restart
      integer                                        :: pass_cohort_age_tracking
-     integer                                        :: pass_canopy_damage
-     integer                                        :: pass_understory_damage
+     integer                                        :: pass_crown_damage
      integer                                        :: pass_biogeog
      integer                                        :: pass_num_lu_harvest_types
      integer                                        :: pass_lu_harvest
@@ -452,19 +450,12 @@ verbose_output = .false.
         end if
         call set_fates_ctrlparms('use_cohort_age_tracking',ival=pass_cohort_age_tracking)
 
-        if(use_fates_canopy_damage) then
-           pass_canopy_damage = 1
+        if(use_fates_crown_damage) then
+           pass_crown_damage = 1
         else
-           pass_canopy_damage = 0
+           pass_crown_damage = 0
         end if
-        call set_fates_ctrlparms('use_canopy_damage',ival=pass_canopy_damage)
-
-        if(use_fates_understory_damage) then
-           pass_understory_damage = 1
-        else
-           pass_understory_damage = 0
-        end if
-        call set_fates_ctrlparms('use_understory_damage',ival=pass_understory_damage)
+        call set_fates_ctrlparms('use_crown_damage',ival=pass_crown_damage)
 
         if(use_fates_inventory_init) then
            pass_inventory_init = 1
