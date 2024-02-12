@@ -149,7 +149,7 @@ module ELMFatesInterfaceMod
    use EDInitMod             , only : init_patches
    use EDInitMod             , only : set_site_properties
    use EDPftVarcon           , only : EDpftvarcon_inst
-   use EDSurfaceRadiationMod , only : ED_SunShadeFracs, ED_Norman_Radiation
+   use FatesRadiationDriveMod, only : FatesSunShadeFracs, FatesNormalizedCanopyRadiation
    use EDBtranMod            , only : btran_ed, &
                                       get_active_suction_layers
    use EDCanopyStructureMod  , only : canopy_summarization, update_hlm_dynamics
@@ -1819,15 +1819,15 @@ contains
 
    !=====================================================================================
 
-   subroutine init_coldstart(this, canopystate_inst, soilstate_inst, frictionvel_inst)
+   subroutine init_coldstart(this, canopystate_inst, soilstate_inst, frictionvel_inst )
 
 
      ! Arguments
      class(hlm_fates_interface_type), intent(inout) :: this
      type(canopystate_type)         , intent(inout) :: canopystate_inst
      type(soilstate_type)           , intent(inout) :: soilstate_inst
-     type(frictionvel_type)  , intent(inout)        :: frictionvel_inst
-
+     type(frictionvel_type)         , intent(inout) :: frictionvel_inst
+     
      ! locals
      integer                                        :: nclumps
      integer                                        :: nc
@@ -2055,7 +2055,7 @@ contains
         ! as well as total patch sun/shade fraction output boundary condition
         ! -------------------------------------------------------------------------------
 
-        call ED_SunShadeFracs(this%fates(nc)%nsites, &
+        call FatesSunShadeFracs(this%fates(nc)%nsites, &
              this%fates(nc)%sites,  &
              this%fates(nc)%bc_in,  &
              this%fates(nc)%bc_out)
@@ -2563,7 +2563,7 @@ contains
        end do
     end do
 
-    call ED_Norman_Radiation(this%fates(nc)%nsites,  &
+    call FatesNormalizedCanopyRadiation(this%fates(nc)%nsites,  &
          this%fates(nc)%sites, &
          this%fates(nc)%bc_in,  &
          this%fates(nc)%bc_out)
@@ -2756,13 +2756,24 @@ contains
          this%fates(nc)%bc_in(s)%tot_litc     = totlitc(c)
       end do
 
-      ! Update history variables that track these variables
-      call fates_hist%update_history_hifrq(nc, &
+      ! Update history variables that track these high frequency variables
+      call fates_hist%update_history_hifrq_simple(nc, &
            this%fates(nc)%nsites,  &
            this%fates(nc)%sites,   &
            this%fates(nc)%bc_in,   &
+           this%fates(nc)%bc_out,  & 
            dtime)
-
+      
+      ! Update history variables that track these multi-dimensioned
+      ! high frequency variables
+      call fates_hist%update_history_hifrq_multi(nc, &
+           this%fates(nc)%nsites,  &
+           this%fates(nc)%sites,   &
+           this%fates(nc)%bc_in,   &
+           this%fates(nc)%bc_out,  & 
+           dtime)
+      
+      
 
     end associate
 end subroutine wrap_update_hifrq_hist
