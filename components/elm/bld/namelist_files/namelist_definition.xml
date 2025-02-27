@@ -359,6 +359,11 @@ Toggle to turn on FATES no competition mode (only relevant if FATES is being use
 Toggle to turn on FATES satellite phenology mode (only relevant if FATES is being used).
 </entry>
 
+<entry id="fates_electron_transport_model" type="char*256" category="physics"
+        group="elm_inparm" valid_values="FvCB1980, JohnsonBerry2021" value="FvCB1980">
+Set the FATES electron transport model
+</entry>
+
 <entry id="use_fates_planthydro" type="logical" category="physics"
         group="elm_inparm" valid_values="" value=".false.">
 Toggle to turn on plant hydraulics (only relevant if FATES is on).
