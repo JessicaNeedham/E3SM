@@ -411,7 +411,7 @@ contains
      integer                                        :: pass_num_luh_states
      integer                                        :: pass_num_luh_transitions
      integer                                        :: pass_lupftdat
-     integer                                        :: pass_electron_transfer_model
+     integer                                        :: pass_electron_transport_model
      ! ----------------------------------------------------------------------------------
      ! FATES lightning definitions
      ! 1 : use a global constant lightning rate found in fates_params.
