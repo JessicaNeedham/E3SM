@@ -272,6 +272,7 @@ contains
           fates_parteh_mode,                            &
           fates_seeddisp_cadence,                       &
           use_fates_tree_damage,                        &
+          use_fates_reforestation,                      &
           use_fates_daylength_factor,                   &
           fates_photosynth_acclimation,                 &
           fates_stomatal_model,                         &
@@ -860,6 +861,7 @@ contains
     call mpi_bcast (fates_parteh_mode, 1, MPI_INTEGER, 0, mpicom, ier)
     call mpi_bcast (fates_seeddisp_cadence, 1, MPI_INTEGER, 0, mpicom, ier)
     call mpi_bcast (use_fates_tree_damage, 1, MPI_LOGICAL, 0, mpicom, ier)
+    call mpi_bcast (use_fates_reforestation, 1, MPI_LOGICAL, 0, mpicom, ier)
     call mpi_bcast (fates_history_dimlevel, 2, MPI_INTEGER, 0, mpicom, ier)
     
     call mpi_bcast (use_betr, 1, MPI_LOGICAL, 0, mpicom, ier)
@@ -1274,6 +1276,7 @@ contains
        write(iulog, *) '    flandusepftdat = ', trim(flandusepftdat)
        write(iulog, *) '    use_fates_planthydro = ', use_fates_planthydro
        write(iulog, *) '    use_fates_tree_damage = ', use_fates_tree_damage
+       write(iulog, *) '    use_fates_reforestation = ', use_fates_reforestation
        write(iulog, *) '    use_fates_cohort_age_tracking = ',use_fates_cohort_age_tracking
        write(iulog, *) '    fates_parteh_mode = ', fates_parteh_mode
        write(iulog, *) '    use_fates_ed_st3 = ',use_fates_ed_st3

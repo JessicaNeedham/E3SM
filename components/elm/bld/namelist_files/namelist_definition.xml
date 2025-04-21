@@ -427,6 +427,12 @@ Toggle to turn on the tree damage module in FATES
 (Only relevant if FATES is on)
 </entry>
 
+<entry id="use_fates_reforestation" type="logical" category="physics"
+        group="elm_inparm" valid_values="" value=".false.">
+Toggle to turn on reforestation in FATES
+(Only relevant if FATES is on)
+</entry>
+
 <entry id="use_fates_cohort_age_tracking" type="logical" category="physics"
        group="elm_inparm" valid_values="" value=".false.">
  Toggle to turn on cohort age tracking (only relevant if FATES is on).

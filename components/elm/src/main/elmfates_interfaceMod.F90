@@ -70,6 +70,7 @@ module ELMFatesInterfaceMod
    use elm_varctl        , only : fates_electron_transport_model
    use elm_varctl        , only : flandusepftdat
    use elm_varctl        , only : use_fates_tree_damage
+   use elm_varctl        , only : use_fates_reforestation
    use elm_varctl        , only : nsrest, nsrBranch
    use elm_varctl        , only : fates_inventory_ctrl_filename
    use elm_varctl        , only : fates_history_dimlevel
@@ -424,6 +425,8 @@ contains
      integer                                        :: pass_num_lu_harvest_cats
      integer                                        :: pass_lu_harvest
      integer                                        :: pass_tree_damage
+     integer                                        :: pass_reforestation
+     integer                                        :: pass_use_luh
      integer                                        :: pass_use_potentialveg     
      integer                                        :: pass_num_luh_states
      integer                                        :: pass_num_luh_transitions
@@ -483,6 +486,13 @@ contains
            pass_tree_damage = 0
         end if
         call set_fates_ctrlparms('use_tree_damage',ival=pass_tree_damage)
+
+        if(use_fates_reforestation)then
+           pass_reforestation = 1
+        else
+           pass_reforestation = 0
+        end if
+        call set_fates_ctrlparms('use_reforestation',ival=pass_reforestation)
         
         if((trim(nu_com)=='ECA') .or. (trim(nu_com)=='MIC')) then
            call set_fates_ctrlparms('nu_com',cval='ECA')

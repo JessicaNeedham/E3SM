@@ -828,6 +828,7 @@ sub setup_cmdl_fates_mode {
                      "use_fates_potentialveg",
                      "use_fates_sp",
                      "use_fates_tree_damage",
+		     "use_fates_reforestation",
                      "use_century_decomp",
                      "use_snicar_ad",
                      "use_vertsoilc",
@@ -862,6 +863,10 @@ sub setup_cmdl_fates_mode {
 
 	# we only dis-allow various fates settings with non-fates runs
        $var = "use_fates_tree_damage";
+       if ( defined($nl->get_value($var)) ) {
+           fatal_error("$var is being set, but can ONLY be set when -bgc fates option is used.\n");
+       }
+       $var = "use_fates_reforestation";
        if ( defined($nl->get_value($var)) ) {
            fatal_error("$var is being set, but can ONLY be set when -bgc fates option is used.\n");
        }
@@ -3441,6 +3446,7 @@ sub setup_logic_fates {
                    "use_fates_potentialveg",
                    "use_fates_sp",
                    "use_fates_tree_damage",
+		   "use_fates_reforestation",
                    "use_fates_daylength_factor",
                    "fates_photosynth_acclimation",
                    "fates_stomatal_model",
